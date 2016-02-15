@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Survey Creation Tool</title>
+  <script type='text/javascript' src="ext/knockout-3.3.0.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+  <script type='text/javascript' src='ext/jquery-2.2.0.min.js'></script>
+  <script type='text/javascript' src='ext/knockout.validation.js'></script>
+  <script type="text/javascript" src="ext/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="ext/bootstrap.js"></script>
+  <script type='text/javascript' src="ext/knockout-sortable.min.js"></script>
+  <script type='text/javascript' src="ext/postbox.js"></script>
+  <script type='text/javascript' src="ext/customHandlers.js"></script>
+</head>
+
+<body>
+  <div data-bind="fadeVisible: !surveyView.questionsVisibility()" class="col-md-12">
+<!--********************** Display Questions that are sortable **********************-->
+    <div class="col-md-6">
+      <div id="main">
+        <div >
+        <h3>Questions</h3>
+      </div>
+        <h5>(Drag and Drop to reorder Questions)</h5>
+        <div class="border" data-bind="sortable: { template: 'taskTmpl', data: qArray }"></div>
+        <button data-bind="click: addTask" type="button" class=" btn-info btn-sm addQuestionBtn">Add Question</button>
+        <hr/>
+        <h3>Delete</h3>
+        <h5>(Drag and Drop over trash to delete!)</h5>
+        <span class="fa fa-trash fa-5x trash" data-bind="sortable: trash"></span>
+        <button class="btn center" data-bind="click: function(){surveyView.runSurvey(qArray().length);}, visible: surveyView.runSurveyVisibility()">Run Survey</button>
+        <script id="taskTmpl" type="text/html">
+          <div class="item border">
+            <span data-bind="visible: !$root.isTaskSelected($data)">
+                    <a href="#" data-bind="text: Question, click: $parent.selectItem"></a>
+                </span>
+            <span data-bind="visibleAndSelect: $root.isTaskSelected($data)">
+                    <input data-bind="value: Question, event: { blur: $root.clearTask }" />
+                </span>
+          </div>
+        </script>
+      </div>
+    </div>
+    <!--********************** Edit Questions Form Fields **********************-->
+    <div class="col-md-6">
+      <h4>Edit Question</h4>
+      <div data-bind="foreach: itemForEditing">
+        <form=role="form">
+          <fieldset class="form-group">
+            <label for="question">Question:</label>
+            <input class="form-control" type="text" data-bind="value: Question" />
+          </fieldset>
+          <label for="answer">Answer:</label>
+          <fieldset data-bind="foreach: Answer">
+            <input class="form-control answer" type="text" data-bind="value: choice" />
+          </fieldset>
+          <fieldset class="form-group">
+            <label for="type">Type:</label>
+            <select class="form-control" data-bind="options: $parent.typeChoices, optionsText: 'name', optionsValue: 'name', value: Type, optionsCaption: 'Choose..'"></select>
+          </fieldset>
+          </form>
+          <div class="col-md-6">
+            <button class="btn btn-info btn-sm" data-bind="click: $parent.acceptItem">Accept</button>
+            <button class="btn btn-info btn-sm" data-bind="click: $parent.revertItem">Cancel</button>
+            <h6>(Verify changes by clicking accept)</h6>
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-info btn-sm" data-bind="click: $parent.addNewAnswer">Add New Answer</button>
+            <button class="btn btn-info btn-sm" data-bind="click: $parent.deleteNewAnswer">Delete Answer</button>
+
+          </div>
+      </div>
+    </div>
+  </div>
+
+<!--********************** Display Survey Questions **********************-->
+
+
+<button class="btn" data-bind="click: surveyView.backToMain(), visible: !surveyView.runSurveyVisibility()">Back to Main</button>
+
+  <div data-bind="fadeVisible: surveyView.questionsVisibility()" class="col-md-8">
+    <!--<pre data-bind="text: ko.toJSON(singleQuestion().chosenValue)"></pre>-->
+    <table class="table">
+        <tr><td><label data-bind="text: singleQuestion().Question()"></label></td></tr>
+        <!--ko if: singleQuestion().Type() === "Drop Down" -->
+        <tr><td><select data-bind="options: singleQuestion().Answer, optionsText: 'choice', optionsValue: 'choice', value: singleQuestion().chosenValue, optionsCaption: 'Choose..'"></select></td></tr>
+        <!--/ko-->
+        <!--ko if: singleQuestion().Type() === "Open-Ended" -->
+        <tr><td><textarea data-bind="value: singleQuestion().chosenValue"></textarea></td></tr>
+        <!--/ko-->
+        <!--ko if: singleQuestion().Type() === "Radio Button" -->
+        <tr data-bind="foreach: singleQuestion().Answer">
+          <td><input type="radio" name="optionsGroup" data-bind="checkedValue: choice, checked: $parent.singleQuestion().chosenValue" />
+          <span data-bind="text: choice"></span></td>
+        </tr>
+        <!--/ko-->
+        <!--ko if: singleQuestion().Type() === "Check Box" -->
+        <tr data-bind="foreach: singleQuestion().Answer">
+        <td>  <input type="checkbox" name="optionsGroup" data-bind="attr: {value: choice}, checked: $parent.singleQuestion().chosenValue" />
+          <span data-bind="text: choice"></span></td>
+        </tr>
+        <!--/ko-->
+    </table>
+
+    <button class="btn" data-bind="click: surveyView.prevQuestion, visible: surveyView.prevQuestionVisibility()">Back</button>
+    <button class="btn" data-bind="click: surveyView.nextQuestion(singleQuestion().chosenValue), visible: surveyView.nextQuestionVisibility()">Next</button>
+    <button class="btn" data-bind="click: surveyView.complete(singleQuestion().chosenValue), visible: surveyView.completeSurveyVisibility()">complete</button>
+    <span data-bind="text: surveyView.errorMsg"></span>
+</div>
+</body>
+
+<!--********************** MODAL for final answers **********************-->
+<div class="container">
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Final Results</h4>
+        </div>
+        <div class="modal-body">
+          <div data-bind="if: surveyView.endSurvey() == true">
+            <div data-bind="foreach: qArray">
+              <form>
+                <fieldset>
+                  <label type="text" data-bind="text: Question" />
+                </fieldset>
+                <fieldset>
+                  <label type="text" data-bind="text: chosenValue" />
+                </fieldset>
+                </br>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <script type='text/javascript' src="app/preloadedQuestions.js"></script>
+  <script type='text/javascript' src="app/surveyView.js"></script>
+  <script type='text/javascript' src="app/main.js"></script>
+</footer>
+</html>

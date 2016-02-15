@@ -1,0 +1,83 @@
+
+    body {
+        font-family: arial;
+    }
+
+    h3 {
+        font-weight: bold;
+        text-align: center;
+    }
+    h5{
+      text-align: center;
+    }
+
+    .border {
+        padding: 5px;
+        margin: 5px;
+        border: black 1px solid;
+         border-radius: 5px;
+    }
+
+    .addQuestionBtn{
+  display:block; /* change this from inline-block */
+  width:20%; /* setting the width */
+  margin:0 auto; /* this will center  it */
+
+    }
+
+    p, a {
+        font-size: .8em;
+        font-weight:900;
+    }
+
+    ul {
+        padding-bottom: 10px;
+    }
+
+    .ko_container {
+        width: 100%;
+        min-height: 50px;
+        background-color: #D8F6FF;
+    }
+
+    .high {
+        background-color: red;
+    }
+
+    .trash {
+        font-size:100px;
+        color:lightblue;
+        text-shadow:2px 2px 4px #000000;
+
+        display:inline-block;
+
+        line-height: 50px;
+
+        background-color: white;
+        text-align: center;
+        vertical-align: bottom;
+    }
+
+
+
+    .item {
+        background-color: #A4D4E3;
+        cursor: move;
+        text-align: center;
+    }
+
+    .item input {
+        width: 100%;
+    }
+
+    #main {
+        float: left;
+        width: 100%;
+        margin-top: 0px;
+    }
+
+    #results {
+        margin-left: 175px;
+        width: 150px;
+    }
+    ​.table { display: block; }​
